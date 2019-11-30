@@ -117,12 +117,7 @@ def test_sarsa_lamda(w):
     print(np.max(Gs))
     assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
 
-
-
-
-def retrace_gamma():
-    env = gym.make('MountainCar-v0')
-    def epsilon_greedy_prob(epsilon, w, done,a):
+def epsilon_greedy_prob(epsilon, w, s, done):
         nA = env.action_space.n
         Q = [np.dot(w, X(s,done,a)) for a in range(nA)]
 
@@ -130,7 +125,7 @@ def retrace_gamma():
         #print(rand)
         prob = 0 
         if rand < epsilon:
-            action = vals.argmax()
+            action = Q.argmax()
             prob = 1 
         else:
             action = env.action_space.sample()
@@ -138,19 +133,26 @@ def retrace_gamma():
             print('sss: {}'.format(prob))
         return int(action), prob
 
-    def expectation_action_all_q(a, w, s, done, prob):
-        expected_value = 0 
-        curr_other_prob = (1 - prob) / 2
-        for a in range(env.action_space.n):
-            
-            if a == action_taken:
-                n_prob = prob
-                #print(prob)
-                val = np.dot(w, X(s,done,a))
-                expected_value += n_prob * val
-            else: 
-                print(curr_other_prob)
-                expected_value += curr_other_prob * val
+def expectation_action_all_q(a_t, w, s, done, prob):
+    expected_value = 0 
+    curr_other_prob = (1 - prob) / 2
+    for a in range(env.action_space.n):
+        
+        if a == a_t:
+            n_prob = prob
+            #print(prob)
+            val = np.dot(w, X(s,done,a))
+            expected_value += n_prob * val
+        else: 
+            print(curr_other_prob)
+            expected_value += curr_other_prob * val
+
+
+def retrace_gamma():
+    env = gym.make('MountainCar-v0')
+    
+    gamma = 1 
+    epsilon = .2
 
     nA = env.action_space.n
 
@@ -167,6 +169,7 @@ def retrace_gamma():
     gen = GenEstimator(gamma)
     phi_list = []
 
+    num_episodes = 15
 
     for eps in range(num_episodes):
         print('episode #{}'.format(eps))
@@ -175,7 +178,7 @@ def retrace_gamma():
 
         state, reward, done = env.reset(), 0, False 
 
-        action = epsilon_greedy_policy(state, done, w)
+        action, _ = epsilon_greedy_prob(epsilon, w, state, done)
 
         traj_list.append((state, reward, action, done))
 
@@ -184,8 +187,9 @@ def retrace_gamma():
         while not done:
 
             next_state, reward, done, _ = env.step(action)
-            action = int(epsilon_greedy_policy(next_state, done ,w))
-            traj_list.append((next_state, reward, action, done))
+            action, prob = epsilon_greedy_prob(epsilon, w, next_state, done)
+
+            traj_list.append((next_state, reward, action, done, prob))
             #t+=1 
             T += 1
         
@@ -223,7 +227,7 @@ def retrace_gamma():
                             for i in range(t, u-1)   ])
 
 
-                delta = delta + gen(u -t, T - t) * ((a -b)) * phi_t
+                delta = delta + gen(u -t, T - t) * ((np.dot(w,a) -b)) * phi_t
                 
                 #print(delta)
             w = w - alpha * delta
@@ -253,10 +257,10 @@ def sarsa_gamma():
         else:
             return np.argmax(Q)
 
-    gamma = .5
-    alpha = 0.01 
+    gamma = 1
+    alpha = 1e-4
 
-    num_episodes = 10
+    num_episodes = 50
     
     nA = env.action_space.n
 
@@ -328,7 +332,7 @@ def sarsa_gamma():
                             for i in range(t, u-1)   ])
 
 
-                delta = delta + gen(u -t, T - t) * ((a -b)) * phi_t
+                delta = delta + gen(u -t, T - t) * ((np.dot(w,a) -b)) * phi_t
                 
                 #print(delta)
             w = w - alpha * delta
