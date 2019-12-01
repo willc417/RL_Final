@@ -117,7 +117,8 @@ def test_sarsa_lamda(w):
     print(np.max(Gs))
     assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
 
-def epsilon_greedy_prob(epsilon, w, s, done):
+
+def epsilon_greedy_prob(epsilon, w, s, done, env, X):
         nA = env.action_space.n
         Q = [np.dot(w, X(s,done,a)) for a in range(nA)]
 
@@ -125,7 +126,7 @@ def epsilon_greedy_prob(epsilon, w, s, done):
         #print(rand)
         prob = 0 
         if rand < epsilon:
-            action = Q.argmax()
+            action = np.argmax(Q)
             prob = 1 
         else:
             action = env.action_space.sample()
@@ -133,7 +134,8 @@ def epsilon_greedy_prob(epsilon, w, s, done):
             print('sss: {}'.format(prob))
         return int(action), prob
 
-def expectation_action_all_q(a_t, w, s, done, prob):
+
+def expectation_action_all_q(a_t, w, s, done, prob, env, X):
     expected_value = 0 
     curr_other_prob = (1 - prob) / 2
     for a in range(env.action_space.n):
@@ -153,6 +155,7 @@ def retrace_gamma():
     
     gamma = 1 
     epsilon = .2
+    alpha = 1e-4
 
     nA = env.action_space.n
 
@@ -178,16 +181,16 @@ def retrace_gamma():
 
         state, reward, done = env.reset(), 0, False 
 
-        action, _ = epsilon_greedy_prob(epsilon, w, state, done)
+        action, _ = epsilon_greedy_prob(epsilon, w, state, done, env, X)
 
-        traj_list.append((state, reward, action, done))
+        traj_list.append((state, reward, action, done, _))
 
         T = 0
        
         while not done:
 
             next_state, reward, done, _ = env.step(action)
-            action, prob = epsilon_greedy_prob(epsilon, w, next_state, done)
+            action, prob = epsilon_greedy_prob(epsilon, w, next_state, done, env, X)
 
             traj_list.append((next_state, reward, action, done, prob))
             #t+=1 
@@ -203,7 +206,7 @@ def retrace_gamma():
         reward_list.append(reward)
 
         for u in range(1, T):
-            state, reward, action, done = traj_list[u]
+            state, reward, action, done, _ = traj_list[u]
 
             phi_u  = X(state, done, action)
             phi_list.append(phi_u)
@@ -218,7 +221,7 @@ def retrace_gamma():
 
                 #env.render()
 
-                state, reward, action, done = traj_list[t]
+                state, reward, action, done, _ = traj_list[t]
 
                 phi_t = X(state, done, action)
                 
@@ -238,12 +241,6 @@ def retrace_gamma():
         #t = 0 
         #T = 200 
     return w
-
-
-
-
-
-
 
 
 def sarsa_gamma():
@@ -344,7 +341,7 @@ def sarsa_gamma():
         #T = 200 
     return w
       
-w = sarsa_gamma()
+w = retrace_gamma()
 test_sarsa_lamda(w)
 
 
