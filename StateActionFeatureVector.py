@@ -40,11 +40,12 @@ class StateActionFeatureVectorWithTile():
         implement function x: S+ x A -> [0,1]^d
         if done is True, then return 0^d
         """
+        
         features = np.zeros((self.num_actions * self.num_tilings * self.total_tiles), float)
         if done:
             return features
         for i in range(0, self.num_tilings):
             tile = (s - self.tilings_start[i]) // self.tile_width
             features[int(i * self.total_tiles + tile[0] * self.num_tiles[1] + tile[
-                1] + a)] = 1.0  # storing tiles as a 1 d array, doing index manipultion to access the correct tile
+                1] + int(a) )] = 1.0  # storing tiles as a 1 d array, doing index manipultion to access the correct tile
         return features

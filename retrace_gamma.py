@@ -17,38 +17,6 @@ class GenEstimator():
         return numerator / den
 
 
-def epsilon_greedy_prob(epsilon, w, s, done, env, X):
-    nA = env.action_space.n
-    Q = [np.dot(w, X(s, done, a)) for a in range(nA)]
-
-    rand = np.random.random()
-    # print(rand)
-    prob = 0
-    if rand < epsilon:
-        action = np.argmax(Q)
-        prob = 1
-    else:
-        action = env.action_space.sample()
-        prob = (1 / 3) * epsilon + (1 / 3)
-        # print('sss: {}'.format(prob))
-    return int(action), prob
-
-
-def expectation_action_all_q(a_t, w, s, done, prob, env, X):
-    expected_value = 0
-    curr_other_prob = (1 - prob) / 2
-    for a in range(env.action_space.n):
-
-        if a == a_t:
-            n_prob = prob
-            # print(prob)
-            val = np.dot(w, X(s, done, a))
-            expected_value += n_prob * val
-        else:
-            print(curr_other_prob)
-            expected_value += curr_other_prob * val
-
-
 def retrace_gamma(num_episodes, gamma):
     #gamma = 1
 
@@ -77,7 +45,7 @@ def retrace_gamma(num_episodes, gamma):
         action = np.argmax(Q)
         return int(action), 1
 
-    def all_actions_state_feature(s):
+    def all_actions_state_feature(s, w , done):
         nA = env.action_space.n
 
         Q = [np.dot(w, X(s, done, a)) for a in range(nA)]
@@ -92,23 +60,8 @@ def retrace_gamma(num_episodes, gamma):
             else:
                 agg_feat += 0 * X(s, done, a)
 
-        indx = np.where(agg_feat > 0)
-        agg_feat[tuple(indx)] = 1
         return agg_feat
 
-    def expectation_action_all_q(a_t, w, s, done, prob):
-        expected_value = 0
-        curr_other_prob = (1 - prob) / env.action_space.n
-        for a in range(env.action_space.n):
-
-            if a == a_t:
-                n_prob = prob
-                # print(prob)
-                val = np.dot(w, X(s, done, a))
-                expected_value += n_prob * val
-            else:
-                # print(curr_other_prob)
-                expected_value += curr_other_prob * val
 
     env = gym.make('MountainCar-v0')
 
@@ -157,14 +110,9 @@ def retrace_gamma(num_episodes, gamma):
 
             if tar_action != action:
                 tar_prob = 0
-                # print((next_state, reward, action, done, prob))
             traj_list.append((next_state, reward, action, done, prob, tar_prob))
             # t+=1
             T += 1
-
-        # state, reward, done = env.reset(), 0, False
-
-        # action = epsilon_greedy_policy(state, done, w)
 
         phi_0 = X(state, done, action)
         phi_list.append(phi_0)
@@ -193,7 +141,7 @@ def retrace_gamma(num_episodes, gamma):
                 state, reward, action, done, prob, tar_prob = traj_list[t]
 
                 phi_t = X(state, done, action)
-                phi_all_t = all_actions_state_feature(state)
+                phi_all_t = all_actions_state_feature(state, w, done)
 
                 a = (phi_all_t - phi_t) - (pow(gamma, u - t) * phi_u)
                 b = sum([pow(gamma, i - t) * reward_list[i]
@@ -204,7 +152,7 @@ def retrace_gamma(num_episodes, gamma):
                 im_s = np.prod([1 / prob_list[i]
                                 for i in range(t, u - 1)])
 
-                trunc_is = min(1, im_s)
+                trunc_is = gamma * min(1, im_s)
 
                 delta = delta + gen(u - t, T - t) * \
                         (trunc_is * ((np.dot(w, a) - b)) * phi_t)
