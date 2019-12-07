@@ -9,10 +9,11 @@ def test_sarsa_gamma():
     env = gym.make("MountainCar-v0")
 
     gamma_values = []
-    return_values = []
+    max_values = []
+    min_values = []
     gamma = 1.
 
-    w = sarsa_gamma()
+    w, rewards_per_episode = sarsa_gamma(300, gamma)
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,
@@ -44,10 +45,13 @@ def test_sarsa_gamma():
 
     print(np.max(Gs))
     gamma_values.append(gamma)
-    return_values.append(np.max(Gs))
+    max_values.append(np.max(Gs))
+    min_values.append(np.min(Gs))
         #assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
-    sarsa_gamma_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": return_values})
-    sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv")
-    return sarsa_gamma_data
+    sarsa_gamma_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": max_values, "Min Rewards": min_values})
+    sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv", index=False)
+    sarsa_gamma_rewards_per_episode = pd.DataFrame(data={"Gamma": rewards_per_episode})
+    sarsa_gamma_rewards_per_episode.to_csv("sarsa_gamma_rpe.csv", index=False)
+    return sarsa_gamma_data, sarsa_gamma_rewards_per_episode
 
 test_sarsa_gamma()
