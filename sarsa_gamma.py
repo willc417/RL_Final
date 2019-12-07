@@ -4,6 +4,8 @@ import pandas as pd
 from time import sleep
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 
+np.random.seed(1000)
+
 class GenEstimator():
     def __init__(self, gamma):
         self.gamma = gamma
@@ -42,7 +44,8 @@ def sarsa_gamma(num_episodes, gamma):
 
     gen = GenEstimator(gamma)
     phi_list = []
-
+    rewards_per_episode = []
+    total_rewards = 0
     for eps in range(num_episodes):
         #print('episode #{}'.format(eps))
         traj_list = []
@@ -58,9 +61,14 @@ def sarsa_gamma(num_episodes, gamma):
 
         while not done:
             next_state, reward, done, _ = env.step(action)
+            total_rewards += reward
             action = int(epsilon_greedy_policy(next_state, done, w))
             traj_list.append((next_state, reward, action, done))
             T += 1
+
+        if eps % 10 == 0 and eps != 0:
+            rewards_per_episode.append(total_rewards / 10)
+            total_rewards = 0
 
         phi_0 = X(state, done, action)
         phi_list.append(phi_0)
@@ -89,8 +97,6 @@ def sarsa_gamma(num_episodes, gamma):
                 delta = delta + gen(u - t, T - t) * ((np.dot(w, a) - b)) * phi_t
 
             w = w - alpha * delta
-
         phi_list = []
-        reward_list = []
 
-    return w
+    return w, rewards_per_episode
