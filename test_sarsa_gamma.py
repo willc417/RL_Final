@@ -12,7 +12,7 @@ def test_sarsa_gamma():
     return_values = []
     gamma = 1.
 
-    w = sarsa_gamma()
+    w = sarsa_gamma(10, gamma)
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,

@@ -49,8 +49,8 @@ def expectation_action_all_q(a_t, w, s, done, prob, env, X):
             expected_value += curr_other_prob * val
 
 
-def retrace_gamma():
-    gamma = 1
+def retrace_gamma(num_episodes, gamma):
+    #gamma = 1
 
     def epsilon_greedy_prob(epsilon, w, s, done):
         nA = env.action_space.n
@@ -121,7 +121,7 @@ def retrace_gamma():
         env.observation_space.low,
         env.observation_space.high,
         env.action_space.n,
-        num_tilings=20,
+        num_tilings=10,
         tile_width=np.array([.45, .035])
     )
 
@@ -129,8 +129,6 @@ def retrace_gamma():
 
     gen = GenEstimator(gamma)
     phi_list = []
-
-    num_episodes = 20
 
     for eps in range(num_episodes):
         #print('episode #{}'.format(eps))
