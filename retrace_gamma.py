@@ -1,6 +1,6 @@
 import numpy as np
 import gym
-import pandas as pd
+#import pandas as pd
 from time import sleep
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 
@@ -50,6 +50,8 @@ def expectation_action_all_q(a_t, w, s, done, prob, env, X):
 
 
 def retrace_gamma():
+    gamma = 1
+
     def epsilon_greedy_prob(epsilon, w, s, done):
         nA = env.action_space.n
         Q = [np.dot(w, X(s, done, a)) for a in range(nA)]
@@ -110,7 +112,6 @@ def retrace_gamma():
 
     env = gym.make('MountainCar-v0')
 
-    gamma = 1
     epsilon = .2
     alpha = 1e-4
 
@@ -132,7 +133,7 @@ def retrace_gamma():
     num_episodes = 20
 
     for eps in range(num_episodes):
-        print('episode #{}'.format(eps))
+        #print('episode #{}'.format(eps))
         traj_list = []
         reward_list = []
         prob_list = []

@@ -31,7 +31,8 @@ def SarsaLambda(
         action_x = X(observation, done, action)
         Q_old = 0
         z = 0
-        for t in range(0, episode):
+        #t = 0
+        while not done: #for t in range(0, episode):
             observation, reward, done, info = env.step(action)
             next_action = epsilon_greedy_policy(observation, done, w)
             next_action_x = X(observation, done, next_action)

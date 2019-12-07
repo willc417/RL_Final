@@ -2,17 +2,17 @@ from StateActionFeatureVector import StateActionFeatureVectorWithTile
 from retrace_gamma import retrace_gamma
 import numpy as np
 import gym
+import pandas as pd
 
 
 def test_retrace_gamma():
     env = gym.make("MountainCar-v0")
 
-    w = retrace_gamma()
     gamma_values = []
     return_values = []
 
     gamma = 1.
-
+    w = retrace_gamma()
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,
@@ -46,9 +46,9 @@ def test_retrace_gamma():
     gamma_values.append(gamma)
     return_values.append(np.max(Gs))
     # assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
-    # sarsa_gamma_data = pd.DataFrame(data={"Gamma Value": gamma_values, "Max Record": return_values})
-    # sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv")
-
+    retrace_gamma_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": return_values})
+    retrace_gamma_data.to_csv("retrace_gamma_returns.csv")
+    return retrace_gamma_data
 
 if __name__ == "__main__":
     test_retrace_gamma()

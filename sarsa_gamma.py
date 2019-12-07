@@ -26,10 +26,10 @@ def sarsa_gamma():
         else:
             return np.argmax(Q)
 
-    gamma = 1
     alpha = 1e-4
+    gamma = 1
 
-    num_episodes = 15
+    num_episodes = 20
 
     nA = env.action_space.n
 
@@ -47,7 +47,7 @@ def sarsa_gamma():
     phi_list = []
 
     for eps in range(num_episodes):
-        print('episode #{}'.format(eps))
+        #print('episode #{}'.format(eps))
         traj_list = []
         reward_list = []
 

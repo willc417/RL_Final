@@ -1,18 +1,18 @@
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 from sarsa_gamma import sarsa_gamma
 import numpy as np
+import pandas as pd
 import gym
 
 def test_sarsa_gamma():
 
     env = gym.make("MountainCar-v0")
 
-    w = sarsa_gamma()
     gamma_values = []
     return_values = []
-
     gamma = 1.
 
+    w = sarsa_gamma()
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,
@@ -46,7 +46,8 @@ def test_sarsa_gamma():
     gamma_values.append(gamma)
     return_values.append(np.max(Gs))
         #assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
-    #sarsa_gamma_data = pd.DataFrame(data={"Gamma Value": gamma_values, "Max Record": return_values})
-    #sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv")
+    sarsa_gamma_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": return_values})
+    sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv")
+    return sarsa_gamma_data
 
 test_sarsa_gamma()
