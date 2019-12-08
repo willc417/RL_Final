@@ -12,7 +12,8 @@ def RetraceLambda(
     X:StateActionFeatureVectorWithTile,
     num_episode:int,
 ) -> np.array:
-    
+
+    np.seterr(all='ignore')
 
     def epsilon_greedy_policy(s,done,w,epsilon=.0):
         nA = env.action_space.n
@@ -77,7 +78,7 @@ def RetraceLambda(
             Q_old = Q_prime
             action_x = next_action_x
             action = next_action
-        if episode % 10 == 0 and episode != 0:
+        if (episode + 1) % 10 == 0 and episode != 0:
             rewards_per_episode.append(total_reward / 10)
             total_reward = 0
     return w, rewards_per_episode

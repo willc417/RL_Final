@@ -2,18 +2,27 @@ from StateActionFeatureVector import StateActionFeatureVectorWithTile
 from sarsa_gamma import sarsa_gamma
 import numpy as np
 import pandas as pd
+import argparse
 import gym
+import time
 
-def test_sarsa_gamma():
+def test_sarsa_gamma(num_episodes=None):
 
     env = gym.make("MountainCar-v0")
+    if num_episodes is None:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--num_eps', default=10, type=int)
+        args = parser.parse_args()
+        num_episodes = args.num_eps
 
     gamma_values = []
     max_values = []
     min_values = []
     gamma = 1.
-
-    w, rewards_per_episode = sarsa_gamma(300, gamma)
+    start_time = time.time()
+    w, rewards_per_episode = sarsa_gamma(num_episodes, gamma)
+    total_time = time.time() - start_time
+    print("Sarsa Gamma training time with {} episodes: {} s".format(num_episodes, total_time))
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,
@@ -54,4 +63,5 @@ def test_sarsa_gamma():
     sarsa_gamma_rewards_per_episode.to_csv("sarsa_gamma_rpe.csv", index=False)
     return sarsa_gamma_data, sarsa_gamma_rewards_per_episode
 
-test_sarsa_gamma()
+if __name__ == "__main__":
+    test_sarsa_gamma()

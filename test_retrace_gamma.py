@@ -3,10 +3,11 @@ from retrace_gamma import retrace_gamma
 import numpy as np
 import gym
 import pandas as pd
-
+import time
 import argparse
 
-def test_retrace_gamma():
+
+def test_retrace_gamma(num_episodes=None):
     env = gym.make("MountainCar-v0")
 
     gamma_values = []
@@ -14,17 +15,17 @@ def test_retrace_gamma():
     min_values = []
 
     return_values = []
-    
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--num_eps', default=10, type=int)
-
-    args = parser.parse_args()
-
-    num_episodes = args.num_eps
+    if num_episodes is None:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--num_eps', default=10, type=int)
+        args = parser.parse_args()
+        num_episodes = args.num_eps
 
     gamma = 1
+    start_time = time.time()
     w, reward_list = retrace_gamma(num_episodes, gamma)
+    total_time = time.time() - start_time
+    print("Retrace Gamma training time with {} episodes: {} s".format(num_episodes, total_time))
     X = StateActionFeatureVectorWithTile(
         env.observation_space.low,
         env.observation_space.high,
@@ -66,7 +67,10 @@ def test_retrace_gamma():
     episodes_data.to_csv('retrace_gamma_returns.csv', index=False)
     retrace_gamma_data = pd.DataFrame(data={"Gamma": reward_list})
     retrace_gamma_data.to_csv("retrace_gamma_rpe.csv", index=False)
-    return retrace_gamma_data
+
+    retrace_gamma_rewards_per_episode = pd.DataFrame(data={"Gamma": reward_list})
+    retrace_gamma_rewards_per_episode.to_csv("retrace_gamma_rpe.csv", index=False)
+    return retrace_gamma_data, retrace_gamma_rewards_per_episode
 
 if __name__ == "__main__":
     test_retrace_gamma()

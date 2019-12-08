@@ -66,7 +66,7 @@ def sarsa_gamma(num_episodes, gamma):
             traj_list.append((next_state, reward, action, done))
             T += 1
 
-        if eps % 10 == 0 and eps != 0:
+        if (eps + 1) % 10 == 0 and eps != 0:
             rewards_per_episode.append(total_rewards / 10)
             total_rewards = 0
 
