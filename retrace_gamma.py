@@ -4,7 +4,8 @@ import gym
 from time import sleep
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 
-np.random.seed(3258415304)
+#np.random.seed(3258415304)
+np.random.seed(1000)
 #print(np.random.get_state()[1][0])
 
 class GenEstimator():
@@ -64,11 +65,28 @@ def retrace_gamma(num_episodes, gamma):
 
         return agg_feat
 
+    def all_actions_qvals(s, w , done):
+        nA = env.action_space.n
+
+        Q = [np.dot(w, X(s, done, a)) for a in range(nA)]
+        Q = np.array(Q)
+
+        action = np.argmax(Q)
+
+        agg_feat = 0
+        for a in range(nA):
+            if a == action:
+                agg_feat += 1 * Q[a]
+            else:
+                agg_feat += 0 * Q[a]
+
+        return agg_feat
+
 
     env = gym.make('MountainCar-v0')
 
     epsilon = .1
-    alpha = 1e-3
+    alpha = 1e-4
 
     nA = env.action_space.n
 
@@ -137,12 +155,12 @@ def retrace_gamma(num_episodes, gamma):
             state, reward, action, done, prob, tar_prob = traj_list[u]
 
             phi_u = X(state, done, action)
-            phi_list.append(phi_u)
             reward_list.append(reward)
             prob_list.append(prob)
             tar_prob_list.append(tar_prob)
 
             delta = np.zeros((X.feature_vector_len()))
+            #trunc_is
 
             for t in range(0, u - 1):
                 # print(t)
@@ -154,21 +172,28 @@ def retrace_gamma(num_episodes, gamma):
                 state, reward, action, done, prob, tar_prob = traj_list[t]
 
                 phi_t = X(state, done, action)
-                phi_all_t = all_actions_state_feature(state, w, done)
+                #phi_all_t = all_actions_state_feature(state, w, done)
+                qvals = all_actions_qvals(state, w, done)
 
-                a = (phi_all_t - phi_t) - (pow(gamma, u - t) * phi_u)
+                im_s = np.prod([1 / prob_list[i]
+                                for i in range(t, u - 1)])
+
+                trunc_is = min(1, im_s)
+
+                #a = (trunc_is*(phi_all_t - phi_t)) - (pow(gamma, u - t) * phi_u)
+                a = phi_t - (pow(gamma, u - t) * phi_u)
                 b = sum([pow(gamma, i - t) * reward_list[i]
                          for i in range(t, u - 1)])
 
                 # print([ (tar_prob_list[i], prob_list[i])
                 #                    for i in range(t, u-1) ])
-                im_s = np.prod([1 / prob_list[i]
-                                for i in range(t, u - 1)])
 
-                trunc_is = gamma * min(1, im_s)
-
-                delta = delta + gen(u - t, T - t) * \
-                        (trunc_is * ((np.dot(w, a) - b)) * phi_t)
+                if eps > 50:
+                    delta = delta + gen(u - t, T - t) * \
+                            (( trunc_is * (np.dot(w, a) - b+qvals) ) * phi_t)
+                else:
+                    delta = delta + gen(u - t, T - t) * \
+                            (((np.dot(w, a) - b+qvals) ) * phi_t)
 
                 # print(delta)
             w = w - alpha * delta
