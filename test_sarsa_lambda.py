@@ -2,9 +2,17 @@ import numpy as np
 import gym
 from sarsa_lambda import SarsaLambda, StateActionFeatureVectorWithTile
 import pandas as pd
+import argparse
 
-def test_sarsa_lambda():
+import time
 
+
+def test_sarsa_lambda(num_episodes=None):
+    if num_episodes is None:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--num_eps', default=10, type=int)
+        args = parser.parse_args()
+        num_episodes = args.num_eps
 
     env = gym.make("MountainCar-v0") #gym.make("MountainCar-v0")
     gamma = 1.
@@ -40,7 +48,10 @@ def test_sarsa_lambda():
     rewards_per_lambda = []
     sarsa_lambda_rpe = pd.DataFrame()
     for i in range(0,5):
-        w, rewards_per_episode = SarsaLambda(env, gamma, lam, 0.01, X, 300)
+        start_time = time.time()
+        w, rewards_per_episode = SarsaLambda(env, gamma, lam, 0.01, X, num_episodes)
+        total_time = time.time() - start_time
+        print("Sarsa Lambda (Lambda = {}) training time with {} episodes: time: {} s".format(round(lam, 2), num_episodes ,total_time))
         Gs = [_eval() for _ in  range(100)]
         _eval(False)
         lambda_values.append(lam)
