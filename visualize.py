@@ -8,10 +8,23 @@ def main():
     print(sarsa_lambda_rpe)
 
     sarsa_gamma_rpe = pd.read_csv("sarsa_gamma_rpe.csv")
+    print(sarsa_gamma_rpe)
 
     sarsa_lambda_rpe = sarsa_lambda_rpe.join(sarsa_gamma_rpe)
     sarsa_lambda_rpe.plot()
     plt.savefig("sarsa_lambda.png")
+    plt.show()
+
+
+    sarsa_lambda_rpe = pd.read_csv("retrace_lambda_rewards_per_episode.csv")
+    print(sarsa_lambda_rpe)
+
+    sarsa_gamma_rpe = pd.read_csv("retrace_gamma_rpe.csv")
+    print(sarsa_gamma_rpe)
+
+    sarsa_lambda_rpe = sarsa_lambda_rpe.join(sarsa_gamma_rpe)
+    sarsa_lambda_rpe.plot()
+    plt.savefig("retrace_lambda.png")
     plt.show()
 
 

@@ -4,6 +4,8 @@ import gym
 from time import sleep
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 
+np.random.seed(3258415304)
+#print(np.random.get_state()[1][0])
 
 class GenEstimator():
     def __init__(self, gamma):
@@ -19,7 +21,7 @@ class GenEstimator():
 
 def retrace_gamma(num_episodes, gamma):
     #gamma = 1
-
+    reward_list = []
     def epsilon_greedy_prob(epsilon, w, s, done):
         nA = env.action_space.n
         Q = [np.dot(w, X(s, done, a)) for a in range(nA)]
@@ -65,8 +67,8 @@ def retrace_gamma(num_episodes, gamma):
 
     env = gym.make('MountainCar-v0')
 
-    epsilon = .2
-    alpha = 1e-4
+    epsilon = .1
+    alpha = 1e-3
 
     nA = env.action_space.n
 
@@ -83,6 +85,9 @@ def retrace_gamma(num_episodes, gamma):
     gen = GenEstimator(gamma)
     phi_list = []
 
+    rewards_per_episode = []
+    total_rewards = 0
+
     for eps in range(num_episodes):
         #print('episode #{}'.format(eps))
         traj_list = []
@@ -98,13 +103,17 @@ def retrace_gamma(num_episodes, gamma):
         if tar_action != action:
             tar_prob = 0
 
+        
+
         traj_list.append((state, reward, action, done, prob, tar_prob))
 
         T = 0
-
+        
         while not done:
 
             next_state, reward, done, _ = env.step(action)
+            total_rewards += reward
+            #reward_list.append(reward)
             action, prob = epsilon_greedy_prob(epsilon, w, next_state, done)
             tar_action, tar_prob = target_policy(w, state, done)
 
@@ -113,6 +122,10 @@ def retrace_gamma(num_episodes, gamma):
             traj_list.append((next_state, reward, action, done, prob, tar_prob))
             # t+=1
             T += 1
+
+        if eps % 10 == 0 and eps != 0:
+            rewards_per_episode.append(total_rewards / 10)
+            total_rewards = 0
 
         phi_0 = X(state, done, action)
         phi_list.append(phi_0)
@@ -164,5 +177,5 @@ def retrace_gamma(num_episodes, gamma):
         phi_list = []
         reward_list = []
 
-    return w
+    return w, rewards_per_episode
 

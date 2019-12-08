@@ -1,6 +1,8 @@
 import numpy as np
 from StateActionFeatureVector import StateActionFeatureVectorWithTile
 
+np.random.seed(1000)
+
 
 def RetraceLambda(
     env, # openai gym environment
@@ -43,7 +45,10 @@ def RetraceLambda(
                 
 
         return agg_feat, prob
-
+    
+    rewards_per_episode = []
+    
+    total_reward = 0
     w = np.zeros((X.feature_vector_len()))
     for episode in range(num_episode):
         done = False
@@ -53,8 +58,11 @@ def RetraceLambda(
         Q_old = 0
         z = 0
         #t = 0
+
         while not done: #for t in range(0, episode):
             observation, reward, done, info = env.step(action)
+            total_reward += reward
+            #reward_list.append(total_reward)
             next_action, prob = epsilon_greedy_policy(observation, done, w)
             next_action_x = X(observation, done, next_action)
             Q = np.dot(w, action_x)
@@ -69,4 +77,7 @@ def RetraceLambda(
             Q_old = Q_prime
             action_x = next_action_x
             action = next_action
-    return w
+        if episode % 10 == 0 and episode != 0:
+            rewards_per_episode.append(total_reward / 10)
+            total_reward = 0
+    return w, rewards_per_episode
