@@ -57,7 +57,6 @@ def test_retrace_gamma(num_episodes=None):
     Gs = [_eval() for _ in range(100)]
     _eval(False)
 
-    print(np.max(Gs))
     gamma_values.append(gamma)
     return_values.append(np.max(Gs))
     max_values.append(np.max(Gs))

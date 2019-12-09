@@ -52,11 +52,9 @@ def test_sarsa_gamma(num_episodes=None):
     Gs = [_eval() for _ in range(100)]
     _eval(False)
 
-    print(np.max(Gs))
     gamma_values.append(gamma)
     max_values.append(np.max(Gs))
     min_values.append(np.min(Gs))
-        #assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
     sarsa_gamma_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": max_values, "Min Rewards": min_values})
     sarsa_gamma_data.to_csv("sarsa_gamma_returns.csv", index=False)
     sarsa_gamma_rewards_per_episode = pd.DataFrame(data={"Gamma": rewards_per_episode})

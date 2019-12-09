@@ -72,13 +72,7 @@ def retrace_gamma(num_episodes, gamma):
         Q = np.array(Q)
 
         action = np.argmax(Q)
-
-        agg_feat = 0
-        for a in range(nA):
-            if a == action:
-                agg_feat += 1 * Q[a]
-            else:
-                agg_feat += 0 * Q[a]
+        agg_feat = 1 * Q[action]
 
         return agg_feat
 
@@ -120,8 +114,6 @@ def retrace_gamma(num_episodes, gamma):
 
         if tar_action != action:
             tar_prob = 0
-
-        
 
         traj_list.append((state, reward, action, done, prob, tar_prob))
 

@@ -55,7 +55,6 @@ def test_sarsa_lambda(num_episodes=None):
         Gs = [_eval() for _ in  range(100)]
         _eval(False)
         lambda_values.append(lam)
-        print(np.max(Gs))
         max_values.append(np.max(Gs))
         min_values.append(np.min(Gs))
         sarsa_lambda_rpe.insert(i, str(round(lam, 2)), rewards_per_episode)
