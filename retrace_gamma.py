@@ -174,6 +174,7 @@ def retrace_gamma(num_episodes, gamma):
 
                 #a = (trunc_is*(phi_all_t - phi_t)) - (pow(gamma, u - t) * phi_u)
                 a = phi_t - (pow(gamma, u - t) * phi_u)
+                
                 b = sum([pow(gamma, i - t) * reward_list[i]
                          for i in range(t, u - 1)])
 

@@ -59,12 +59,18 @@ def test_retrace_lambda(num_episodes = None):
         print("Retrace Lambda (Lambda = {}) training time with {} episodes: time: {} s".format(round(lam, 2), num_episodes, total_time))
         Gs = [_eval() for _ in  range(100)]
         _eval(False)
+        
+        lambda_values.append(lam)
+
         return_values.append(np.max(Gs))
         max_values.append(np.max(Gs))
         min_values.append(np.min(Gs))
         r_lambda_rpe.insert(i, str(round(lam, 2)), reward_list)
         lam -= 0.2
 
+    print(len(lambda_values))
+    print(len(max_values))
+    print(len(min_values))
     r_eps_data = pd.DataFrame(data={"Lambda Values": lambda_values, "Max Rewards": max_values, "Min Rewards": min_values})
     r_eps_data.to_csv('retrace_lambda_returns.csv', index=False)
     

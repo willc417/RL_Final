@@ -85,16 +85,25 @@ def sarsa_gamma(num_episodes, gamma):
             delta = np.zeros((X.feature_vector_len()))
 
             for t in range(0, u - 1):
-
+                
                 state, reward, action, done = traj_list[t]
 
                 phi_t = X(state, done, action)
 
+                if t != u:
+                    s, _, a, _ = traj_list[t+1]
+                    phi_t_next = X(s, done, a)
+                    #Q_next = np.dot(w, X(s, done, a))
+                else:
+                    phi_t_next = np.zeros(phi_t.shape)
+                    Q_next = 0
+
                 a = phi_t - pow(gamma, u - t) * phi_u
+                a_prime = phi_t_next - pow(gamma, u - t) * phi_u
                 b = sum([pow(gamma, i - t) * reward_list[i]
                          for i in range(t, u - 1)])
 
-                delta = delta + gen(u - t, T - t) * ((np.dot(w, a) - b)) * phi_t
+                delta = delta + gen(u - t, T - t) * ((np.dot(w, a) - (b+np.dot(w, a_prime)))) * phi_t
 
             w = w - alpha * delta
         phi_list = []
