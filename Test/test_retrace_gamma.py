@@ -1,4 +1,4 @@
-from StateActionFeatureVector import StateActionFeatureVectorWithTile
+from Feature_Representation.StateActionFeatureVector import StateActionFeatureVectorWithTile
 from Retrace.retrace_gamma import retrace_gamma
 import numpy as np
 import gym
@@ -64,12 +64,10 @@ def test_retrace_gamma(num_episodes=None):
     # assert np.max(Gs) >= -110.0, 'fail to solve mountaincar'
     episodes_data = pd.DataFrame(data={"Gamma Values": gamma_values, "Max Rewards": max_values, "Min Rewards": min_values})
     episodes_data.to_csv('retrace_gamma_returns.csv', index=False)
-    retrace_gamma_data = pd.DataFrame(data={"Gamma": reward_list})
-    retrace_gamma_data.to_csv("retrace_gamma_rpe.csv", index=False)
 
     retrace_gamma_rewards_per_episode = pd.DataFrame(data={"Gamma": reward_list})
     retrace_gamma_rewards_per_episode.to_csv("retrace_gamma_rpe.csv", index=False)
-    return retrace_gamma_data, retrace_gamma_rewards_per_episode
+    return episodes_data, retrace_gamma_rewards_per_episode
 
 if __name__ == "__main__":
     test_retrace_gamma()

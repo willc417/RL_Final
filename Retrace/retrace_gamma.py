@@ -1,8 +1,7 @@
 import numpy as np
 import gym
 #import pandas as pd
-from time import sleep
-from StateActionFeatureVector import StateActionFeatureVectorWithTile
+from Feature_Representation.StateActionFeatureVector import StateActionFeatureVectorWithTile
 
 #np.random.seed(3258415304)
 np.random.seed(1000)

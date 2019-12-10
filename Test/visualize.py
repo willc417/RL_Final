@@ -53,8 +53,8 @@ def main():
     sarsa_l_max_min = pd.read_csv("used_retrace_lambda_returns.csv")
     sarsa_g_max_min = pd.read_csv("used_retrace_gamma_returns.csv")
 
-    sarsa_l_max_min = sarsa_l_max_min.rename(columns={"Lambda Values": "Lambda Values (1.0 Represents Sarsa Gamma)"})
-    sarsa_g_max_min = sarsa_g_max_min.rename(columns={"Gamma Values": "Lambda Values (1.0 Represents Sarsa Gamma)"})
+    sarsa_l_max_min = sarsa_l_max_min.rename(columns={"Lambda Values": "Lambda Values (1.0 Represents Retrace Gamma)"})
+    sarsa_g_max_min = sarsa_g_max_min.rename(columns={"Gamma Values": "Lambda Values (1.0 Represents Retrace Gamma)"})
     sarsa_l_max_min = sarsa_l_max_min.append(sarsa_g_max_min)
 
     sarsa_l_max_min.plot.bar(x=0, title="Retrace Lambda and Retrace Gamma Evaluation Rewards")

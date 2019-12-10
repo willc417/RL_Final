@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 from Retrace.retrace_lambda import RetraceLambda
-from StateActionFeatureVector import StateActionFeatureVectorWithTile
+from Feature_Representation.StateActionFeatureVector import StateActionFeatureVectorWithTile
 import argparse
 import time
 import pandas as pd
@@ -43,7 +43,7 @@ def test_retrace_lambda(num_episodes = None):
 
             G += r
         return G
-    lam = 1
+    lam = 0.8
     lambda_values = []
     return_values = []
 
@@ -52,7 +52,7 @@ def test_retrace_lambda(num_episodes = None):
 
     r_lambda_rpe = pd.DataFrame()
 
-    for i in range(0,5):
+    for i in range(0,4):
         start_time = time.time()
         w, reward_list = RetraceLambda(env, gamma, lam, 0.01, X, num_episodes)
         total_time = time.time() - start_time
@@ -60,7 +60,7 @@ def test_retrace_lambda(num_episodes = None):
         Gs = [_eval() for _ in  range(100)]
         _eval(False)
         
-        lambda_values.append(lam)
+        lambda_values.append(str(round(lam,2)))
 
         return_values.append(np.max(Gs))
         max_values.append(np.max(Gs))
@@ -68,9 +68,7 @@ def test_retrace_lambda(num_episodes = None):
         r_lambda_rpe.insert(i, str(round(lam, 2)), reward_list)
         lam -= 0.2
 
-    print(len(lambda_values))
-    print(len(max_values))
-    print(len(min_values))
+
     r_eps_data = pd.DataFrame(data={"Lambda Values": lambda_values, "Max Rewards": max_values, "Min Rewards": min_values})
     r_eps_data.to_csv('retrace_lambda_returns.csv', index=False)
     
